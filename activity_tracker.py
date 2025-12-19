@@ -17,7 +17,11 @@ import matplotlib.pyplot as plt
 
 # Configuration
 TRACKING_INTERVAL = 5  # Check active window every 5 seconds
+<<<<<<< HEAD
 DAILY_REPORT_TIME = "20:00"  # 8 PM
+=======
+DAILY_REPORT_TIME = "18:00"  # 6 PM
+>>>>>>> 5c0110aebe403c6ece1a33f75f6c631d5c7a1517
 GOOGLE_SHEET_NAME = "Activity Tracker"
 CREDENTIALS_FILE = "credentials.json"  # Google Sheets API credentials
 DATA_FILE = "activity_data.json"
@@ -40,8 +44,11 @@ class ActivityTracker:
         """Save activity data to file"""
         with open(DATA_FILE, 'w') as f:
             json.dump(self.activity_data, f, indent=2)
+<<<<<<< HEAD
             f.flush()  # Force write to disk immediately
             os.fsync(f.fileno())  # Ensure it's written to disk
+=======
+>>>>>>> 5c0110aebe403c6ece1a33f75f6c631d5c7a1517
     
     def get_active_window(self):
         """Get the currently active window title and process name"""
@@ -56,7 +63,11 @@ class ActivityTracker:
         
         try:
             # For macOS
+<<<<<<< HEAD
             from AppKit import NSWorkspace # type: ignore
+=======
+            from AppKit import NSWorkspace
+>>>>>>> 5c0110aebe403c6ece1a33f75f6c631d5c7a1517
             active_app = NSWorkspace.sharedWorkspace().activeApplication()
             return active_app['NSApplicationName']
         except:
@@ -95,8 +106,14 @@ class ActivityTracker:
         self.last_check_time = current_time
         self.last_active_window = active_window
         
+<<<<<<< HEAD
         # Save data more frequently for immediate updates
         self.save_data()
+=======
+        # Save data periodically
+        if int(current_time) % 60 == 0:  # Save every minute
+            self.save_data()
+>>>>>>> 5c0110aebe403c6ece1a33f75f6c631d5c7a1517
     
     def format_time(self, minutes):
         """Convert minutes to hours and minutes format"""
@@ -137,14 +154,19 @@ class ActivityTracker:
         try:
             # Setup Google Sheets API
             scope = ['https://spreadsheets.google.com/feeds',
+<<<<<<< HEAD
                     'https://www.googleapis.com/auth/spreadsheets',
                     'https://www.googleapis.com/auth/drive.file']
+=======
+                    'https://www.googleapis.com/auth/drive']
+>>>>>>> 5c0110aebe403c6ece1a33f75f6c631d5c7a1517
             
             creds = ServiceAccountCredentials.from_json_keyfile_name(
                 CREDENTIALS_FILE, scope
             )
             client = gspread.authorize(creds)
             
+<<<<<<< HEAD
             # Open existing spreadsheet (don't try to create)
             try:
                 sheet = client.open(GOOGLE_SHEET_NAME)
@@ -153,6 +175,13 @@ class ActivityTracker:
                 print(f"Please create it manually at sheets.google.com and share with service account.")
                 print(f"Error details: {e}")
                 return
+=======
+            # Open or create spreadsheet
+            try:
+                sheet = client.open(GOOGLE_SHEET_NAME)
+            except:
+                sheet = client.create(GOOGLE_SHEET_NAME)
+>>>>>>> 5c0110aebe403c6ece1a33f75f6c631d5c7a1517
             
             # Get or create worksheet for current month
             month_name = datetime.datetime.strptime(date_key, "%Y-%m-%d").strftime("%B %Y")
@@ -263,7 +292,11 @@ if __name__ == "__main__":
     
     The script will:
     - Track active windows every 5 seconds
+<<<<<<< HEAD
     - Generate daily reports at 8 PM
+=======
+    - Generate daily reports at 6 PM
+>>>>>>> 5c0110aebe403c6ece1a33f75f6c631d5c7a1517
     - Upload data to Google Sheets
     - Create monthly graphs at end of each month
     """)
@@ -272,6 +305,9 @@ if __name__ == "__main__":
     
     tracker = ActivityTracker()
     tracker.run()
+<<<<<<< HEAD
 import os
 print("Current working directory:", os.getcwd())
 print("Files here:", os.listdir())
+=======
+>>>>>>> 5c0110aebe403c6ece1a33f75f6c631d5c7a1517
