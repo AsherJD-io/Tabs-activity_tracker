@@ -3,7 +3,7 @@ dist/
 .env 
 credentials.json
 activity_data.json
-manual_uploads_script.py
+manual_upload_script.py
 diagnose_credentials.py
 check_sheet_access.py
 check_activity_data.py
