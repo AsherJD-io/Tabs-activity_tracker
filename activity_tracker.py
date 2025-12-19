@@ -138,7 +138,7 @@ class ActivityTracker:
             # Setup Google Sheets API
             scope = ['https://spreadsheets.google.com/feeds',
                     'https://www.googleapis.com/auth/spreadsheets',
-                    'https://www.googleapis.com/auth/drive.file']
+                    'https://www.googleapis.com/auth/drive']
             
             creds = ServiceAccountCredentials.from_json_keyfile_name(
                 CREDENTIALS_FILE, scope
@@ -162,14 +162,19 @@ class ActivityTracker:
                 worksheet = sheet.add_worksheet(title=month_name, rows=100, cols=10)
                 worksheet.append_row(["Date", "Application/Tab", "Time (minutes)", "Time (formatted)"])
             
-            # Append data
+            # Prepare all rows for batch upload (avoids rate limits)
+            rows_to_upload = []
             for app, minutes in activities:
-                worksheet.append_row([
+                rows_to_upload.append([
                     date_key,
                     app,
                     round(minutes, 2),
                     self.format_time(minutes)
                 ])
+            
+            # Batch upload all rows at once
+            if rows_to_upload:
+                worksheet.append_rows(rows_to_upload)
             
             print(f"✓ Data uploaded to Google Sheets: {GOOGLE_SHEET_NAME}")
             
