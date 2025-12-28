@@ -162,6 +162,26 @@ class ActivityTracker:
                 worksheet = sheet.add_worksheet(title=month_name, rows=100, cols=10)
                 worksheet.append_row(["Date", "Application/Tab", "Time (minutes)", "Time (formatted)"])
             
+            # Check if data for this date already exists (make idempotent)
+            try:
+                all_values = worksheet.get_all_values()
+                existing_dates = [row[0] for row in all_values[1:] if row]  # Skip header
+                
+                if date_key in existing_dates:
+                    print(f"⚠ Data for {date_key} already exists in sheet. Removing old entries...")
+                    # Find and delete rows with this date
+                    rows_to_delete = []
+                    for idx, row in enumerate(all_values[1:], start=2):  # Start from row 2 (after header)
+                        if row and row[0] == date_key:
+                            rows_to_delete.append(idx)
+                    
+                    # Delete in reverse order to maintain row indices
+                    for row_idx in reversed(rows_to_delete):
+                        worksheet.delete_rows(row_idx)
+                    print(f"✓ Removed {len(rows_to_delete)} old entries for {date_key}")
+            except Exception as e:
+                print(f"Note: Could not check for existing data: {e}")
+            
             # Prepare all rows for batch upload (avoids rate limits)
             rows_to_upload = []
             for app, minutes in activities:
@@ -202,20 +222,41 @@ class ActivityTracker:
         
         # Sort and get top 10 applications
         sorted_data = sorted(month_data.items(), key=lambda x: x[1], reverse=True)[:10]
-        apps = [item[0][:30] for item in sorted_data]  # Truncate long names
+        apps = [item[0][:30] + "..." if len(item[0]) > 30 else item[0] for item in sorted_data]
         hours = [item[1] / 60 for item in sorted_data]  # Convert to hours
         
-        # Create graph
+        # Create pie chart
         plt.figure(figsize=(12, 8))
-        plt.barh(apps, hours, color='steelblue')
-        plt.xlabel('Hours Spent')
-        plt.ylabel('Application/Tab')
-        plt.title(f'Top 10 Applications - {current_month.strftime("%B %Y")}')
+        colors = plt.cm.Set3(range(len(apps)))
+        
+        # Create pie chart with percentage labels
+        wedges, texts, autotexts = plt.pie(
+            hours, 
+            labels=apps, 
+            autopct='%1.1f%%',
+            startangle=90,
+            colors=colors,
+            textprops={'fontsize': 10}
+        )
+        
+        # Make percentage text bold and white
+        for autotext in autotexts:
+            autotext.set_color('white')
+            autotext.set_fontweight('bold')
+            autotext.set_fontsize(9)
+        
+        plt.title(f'Top 10 Applications - {current_month.strftime("%B %Y")}', 
+                 fontsize=16, fontweight='bold', pad=20)
+        
+        # Add legend with hours
+        legend_labels = [f'{app}: {hour:.1f}h' for app, hour in zip(apps, hours)]
+        plt.legend(legend_labels, loc='center left', bbox_to_anchor=(1, 0, 0.5, 1))
+        
         plt.tight_layout()
         
         filename = f'activity_report_{current_month.strftime("%Y_%m")}.png'
         plt.savefig(filename, dpi=300, bbox_inches='tight')
-        print(f"✓ Monthly graph saved: {filename}")
+        print(f"✓ Monthly pie chart saved: {filename}")
         plt.close()
     
     def run(self):
@@ -277,6 +318,3 @@ if __name__ == "__main__":
     
     tracker = ActivityTracker()
     tracker.run()
-import os
-print("Current working directory:", os.getcwd())
-print("Files here:", os.listdir())
