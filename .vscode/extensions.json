@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    "ms-toolsai.jupyter",
+
+    "ms-python.black-formatter",
+    "charliermarsh.ruff",
+
+    "eamodio.gitlens",
+    "oderwat.indent-rainbow",
+
+    "streetsidesoftware.code-spell-checker",
+    "mechatroner.rainbow-csv"
+  ],
+  "unwantedRecommendations": []
+}
