@@ -8,3 +8,7 @@ diagnose_credentials.py
 check_sheet_access.py
 check_activity_data.py
 manual_upload_script.py
+upload_specific_date.py
+clean_date_data.py
+sort_google_sheet.py
+run_tracker.bat
